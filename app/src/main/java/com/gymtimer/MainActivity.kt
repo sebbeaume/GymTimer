@@ -32,7 +32,8 @@ class MainActivity : ComponentActivity() {
                  * block is one screen.
                  */
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "home") {
+                val startDest = if (TimerService.isSessionActive.value) "session" else "home"
+                NavHost(navController = navController, startDestination = startDest) {
                     composable("home") {
                         HomeScreen(
                             onSessionStart = { navController.navigate("session") },
