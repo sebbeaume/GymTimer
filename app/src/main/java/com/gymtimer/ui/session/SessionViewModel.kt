@@ -24,8 +24,16 @@ class SessionViewModel(app: Application) : AndroidViewModel(app) {
     // Delegate directly to the StateFlows published by the service
     val timerSeconds    = TimerService.timerSeconds
     val isResting       = TimerService.isResting
+    val isVibrating     = TimerService.isVibrating
     val sessionSeconds  = TimerService.sessionSeconds
     val isSessionActive = TimerService.isSessionActive
+
+    fun toggleRest() {
+        val intent = Intent(getApplication(), TimerService::class.java).apply {
+            action = TimerService.ACTION_REST_TOGGLE
+        }
+        getApplication<Application>().startService(intent)
+    }
 
     fun stopSession() {
         // Persist the session to Room before stopping the service

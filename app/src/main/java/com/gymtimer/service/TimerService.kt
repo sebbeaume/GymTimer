@@ -52,6 +52,9 @@ class TimerService : Service() {
         private val _isSessionActive = MutableStateFlow(false)
         val isSessionActive: StateFlow<Boolean> = _isSessionActive
 
+        private val __isVibrating.value = MutableStateFlow(false)
+        val _isVibrating.value: StateFlow<Boolean> = __isVibrating.value
+
         // Expose session start time so we can persist it on stop
         var sessionStartTimestamp = 0L
     }
@@ -60,7 +63,6 @@ class TimerService : Service() {
     private var countDownTimer: CountDownTimer? = null
     private var sessionTimer: CountDownTimer? = null
     private var vibrator: Vibrator? = null
-    private var isVibrating = false
 
     // Real-time anchors — calculated from SystemClock.elapsedRealtime() so that
     // Doze-mode tick delays don't cause drift in the displayed times.
@@ -163,7 +165,7 @@ class TimerService : Service() {
      */
     private fun handleRestToggle() {
         when {
-            isVibrating -> {
+            _isVibrating.value -> {
                 // Timer expired and phone is buzzing → stop buzzing
                 stopVibration()
                 releaseWakeLock()
@@ -230,14 +232,14 @@ class TimerService : Service() {
      * We pulse every 1.5s indefinitely until the user double-presses.
      */
     private fun startVibration() {
-        isVibrating = true
+        _isVibrating.value = true
         val timings = longArrayOf(0, 500, 1000, 500, 1000)   // off, buzz, pause, buzz, pause
         val effect = VibrationEffect.createWaveform(timings, 0) // 0 = loop from index 0
         vibrator?.vibrate(effect)
     }
 
     private fun stopVibration() {
-        isVibrating = false
+        _isVibrating.value = false
         vibrator?.cancel()
     }
 
@@ -270,7 +272,7 @@ class TimerService : Service() {
         )
 
         val actionLabel = when {
-            isVibrating        -> "Dismiss"
+            _isVibrating.value        -> "Dismiss"
             _isResting.value   -> "Cancel Rest"
             else               -> "Start Rest"
         }

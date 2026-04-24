@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
@@ -36,6 +37,7 @@ fun SessionScreen(
 ) {
     val timerSeconds   by vm.timerSeconds.collectAsState()
     val isResting      by vm.isResting.collectAsState()
+    val isVibrating    by vm.isVibrating.collectAsState()
     val sessionSeconds by vm.sessionSeconds.collectAsState()
     val isActive       by vm.isSessionActive.collectAsState()
 
@@ -117,33 +119,45 @@ fun SessionScreen(
                     modifier = Modifier
                         .size(180.dp)
                         .background(
-                            color = if (isResting)
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                            else
-                                MaterialTheme.colorScheme.surface,
+                            color = when {
+                                isVibrating -> MaterialTheme.colorScheme.error.copy(alpha = 0.15f)
+                                isResting   -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                else        -> MaterialTheme.colorScheme.surface
+                            },
                             shape = CircleShape
-                        ),
+                        )
+                        .clickable { vm.toggleRest() },
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = if (isResting) "REST" else "READY",
+                            text = when {
+                                isVibrating -> "DISMISS"
+                                isResting   -> "REST"
+                                else        -> "START REST"
+                            },
                             style = MaterialTheme.typography.labelMedium,
-                            color = if (isResting)
-                                MaterialTheme.colorScheme.primary
-                            else
-                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                            color = when {
+                                isVibrating -> MaterialTheme.colorScheme.error
+                                isResting   -> MaterialTheme.colorScheme.primary
+                                else        -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                            },
                             letterSpacing = 3.sp
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = if (isResting) formatTime(timerSeconds.toLong()) else "--:--",
+                            text = when {
+                                isVibrating -> "DONE"
+                                isResting   -> formatTime(timerSeconds.toLong())
+                                else        -> "--:--"
+                            },
                             fontSize = 42.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isResting)
-                                MaterialTheme.colorScheme.primary
-                            else
-                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                            color = when {
+                                isVibrating -> MaterialTheme.colorScheme.error
+                                isResting   -> MaterialTheme.colorScheme.primary
+                                else        -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                            }
                         )
                     }
                 }
@@ -152,8 +166,9 @@ fun SessionScreen(
             // ── Hint text ─────────────────────────────────────────────────────
             Text(
                 text = when {
-                    isResting -> "Tap 'Cancel Rest' in the notification to stop"
-                    else      -> "Tap 'Start Rest' in the notification after a set"
+                    isVibrating -> "Tap the circle or notification to dismiss"
+                    isResting   -> "Tap the circle or notification to cancel rest"
+                    else        -> "Tap the circle or notification after a set"
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
