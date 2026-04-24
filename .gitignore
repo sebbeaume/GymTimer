@@ -1,0 +1,12 @@
+# Local notes — not for version control
+NOTES.md
+icon_preview.html
+
+# Android
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+build/
+captures/
