@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GymTimer</string>
-    <string name="accessibility_service_description">Allows GymTimer to detect volume button double-presses to start and stop rest timers, even while another app is open.</string>
+    <string name="accessibility_service_description">Allows GymTimer to show an accessibility button to start and stop rest timers from any app.</string>
 </resources>

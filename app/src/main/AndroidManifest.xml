@@ -35,8 +35,7 @@
         <!--
             TimerService declared as a foreground service.
             foregroundServiceType="specialUse" is required on Android 14+
-            when no other category fits (we're intercepting volume keys,
-            not playing media).
+            when no other category fits (timer tracking, not media playback).
         -->
         <service
             android:name=".service.TimerService"
@@ -46,7 +45,7 @@
         <service
             android:name=".service.GymTimerAccessibilityService"
             android:exported="true"
-            android:label="GymTimer Volume Control"
+            android:label="GymTimer Rest Timer"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
