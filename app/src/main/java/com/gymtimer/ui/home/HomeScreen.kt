@@ -126,12 +126,12 @@ fun HomeScreen(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                "Volume button not active",
+                                "Accessibility button not active",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onErrorContainer
                             )
                             Text(
-                                "Enable GymTimer in Accessibility settings to use Vol Up double-press from any app.",
+                                "Enable GymTimer in Accessibility settings to use the accessibility button from any app.",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
                             )
@@ -201,7 +201,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Double-press Volume Up to start/stop rest timer",
+                text = "Tap the accessibility button to start/stop rest timer from any app",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
                 textAlign = TextAlign.Center

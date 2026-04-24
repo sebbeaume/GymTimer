@@ -148,8 +148,8 @@ fun SessionScreen(
             // ── Hint text ─────────────────────────────────────────────────────
             Text(
                 text = when {
-                    isResting -> "Double-press Vol Up to cancel rest"
-                    else      -> "Double-press Vol Up after a set\nto start rest timer"
+                    isResting -> "Tap the accessibility button to cancel rest"
+                    else      -> "Tap the accessibility button after a set\nto start rest timer"
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
