@@ -52,8 +52,8 @@ class TimerService : Service() {
         private val _isSessionActive = MutableStateFlow(false)
         val isSessionActive: StateFlow<Boolean> = _isSessionActive
 
-        private val __isVibrating.value = MutableStateFlow(false)
-        val _isVibrating.value: StateFlow<Boolean> = __isVibrating.value
+        private val _isVibrating = MutableStateFlow(false)
+        val isVibrating: StateFlow<Boolean> = _isVibrating
 
         // Expose session start time so we can persist it on stop
         var sessionStartTimestamp = 0L
