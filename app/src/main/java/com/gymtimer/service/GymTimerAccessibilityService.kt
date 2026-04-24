@@ -2,32 +2,59 @@ package com.gymtimer.service
 
 import android.accessibilityservice.AccessibilityButtonController
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
-/**
- * Uses Android's built-in accessibility button (the icon in the nav bar) to
- * trigger the rest timer start/stop from any screen.
- *
- * flagRequestAccessibilityButton tells Android to show the accessibility button
- * whenever this service is active. Tapping it calls our registered callback.
- */
 class GymTimerAccessibilityService : AccessibilityService() {
+
+    // Manual coroutine scope — AccessibilityService has no built-in lifecycleScope
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+
+        // Button starts hidden — shown only when a session is active
+        setButtonVisible(false)
+
+        // Register the tap callback
         accessibilityButtonController.registerAccessibilityButtonCallback(
             object : AccessibilityButtonController.AccessibilityButtonCallback() {
                 override fun onClicked(controller: AccessibilityButtonController) {
-                    if (TimerService.isSessionActive.value) {
-                        startService(Intent(this@GymTimerAccessibilityService, TimerService::class.java).apply {
-                            action = TimerService.ACTION_VOLUME_DOUBLE
-                        })
-                    }
+                    startService(Intent(this@GymTimerAccessibilityService, TimerService::class.java).apply {
+                        action = TimerService.ACTION_VOLUME_DOUBLE
+                    })
                 }
                 override fun onAvailabilityChanged(controller: AccessibilityButtonController, available: Boolean) {}
             }
         )
+
+        // Observe session state and show/hide the button accordingly
+        scope.launch {
+            TimerService.isSessionActive.collect { active ->
+                setButtonVisible(active)
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.cancel()
+    }
+
+    private fun setButtonVisible(visible: Boolean) {
+        val info = serviceInfo ?: return
+        info.flags = if (visible) {
+            info.flags or AccessibilityServiceInfo.FLAG_REQUEST_ACCESSIBILITY_BUTTON
+        } else {
+            info.flags and AccessibilityServiceInfo.FLAG_REQUEST_ACCESSIBILITY_BUTTON.inv()
+        }
+        serviceInfo = info
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
