@@ -17,15 +17,8 @@ import com.gymtimer.ui.theme.GymTimerTheme
  * ComponentActivity is the Jetpack Compose-friendly base class.
  * It gives us setContent{} for Compose and handles modern lifecycle events.
  *
- * We override dispatchKeyEvent to intercept hardware key presses BEFORE
- * they reach any composable — this is how we detect the volume-up double press
- * even when the app is visible.
- *
- * When the screen is OFF or the app is in the background, the service itself
- * needs to handle the button — but Android restricts background key interception
- * since API 29. The pattern here works when the screen is on (app visible or
- * recent apps). For fully locked-screen detection, users would need an
- * Accessibility Service (which requires explicit user permission in Settings).
+ * Rest timer control is handled by GymTimerAccessibilityService via the
+ * system accessibility button — see that class for details.
  */
 class MainActivity : ComponentActivity() {
 

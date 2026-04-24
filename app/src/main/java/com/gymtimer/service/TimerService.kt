@@ -32,7 +32,7 @@ class TimerService : Service() {
     companion object {
         const val ACTION_START_SESSION   = "START_SESSION"
         const val ACTION_STOP_SESSION    = "STOP_SESSION"
-        const val ACTION_VOLUME_DOUBLE   = "VOLUME_DOUBLE"   // sent by MainActivity on double-press
+        const val ACTION_REST_TOGGLE   = "REST_TOGGLE"
         const val EXTRA_REST_DURATION    = "REST_DURATION"
 
         private const val CHANNEL_ID = "gym_timer_channel"
@@ -81,7 +81,7 @@ class TimerService : Service() {
                 startSession()
             }
             ACTION_STOP_SESSION -> stopSession()
-            ACTION_VOLUME_DOUBLE -> handleVolumeDouble()
+            ACTION_REST_TOGGLE -> handleVolumeDouble()
         }
         return START_STICKY
     }
@@ -135,19 +135,19 @@ class TimerService : Service() {
         stopSelf()
     }
 
-    // ── Volume double-press state machine ─────────────────────────────────────
+    // ── Rest toggle state machine ──────────────────────────────────────────────
 
     /**
-     * Three states cycled by double-pressing volume up:
+     * Three states cycled by tapping the accessibility button:
      *
      *  IDLE      → RESTING   : start the rest countdown
      *  RESTING   → IDLE      : timer expired & vibrating → stop vibration
      *  IDLE      → RESTING   : start next rest countdown
      *
-     * If the user double-presses while the timer is still counting (not yet vibrating),
+     * If the user taps while the timer is still counting (not yet vibrating),
      * we cancel the current countdown and go back to IDLE.
      */
-    private fun handleVolumeDouble() {
+    private fun handleRestToggle() {
         when {
             isVibrating -> {
                 // Timer expired and phone is buzzing → stop buzzing

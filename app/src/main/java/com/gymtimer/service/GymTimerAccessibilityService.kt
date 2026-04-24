@@ -24,7 +24,7 @@ class GymTimerAccessibilityService : AccessibilityService() {
             object : AccessibilityButtonController.AccessibilityButtonCallback() {
                 override fun onClicked(controller: AccessibilityButtonController) {
                     startService(Intent(this@GymTimerAccessibilityService, TimerService::class.java).apply {
-                        action = TimerService.ACTION_VOLUME_DOUBLE
+                        action = TimerService.ACTION_REST_TOGGLE
                     })
                 }
                 override fun onAvailabilityChanged(controller: AccessibilityButtonController, available: Boolean) {}
