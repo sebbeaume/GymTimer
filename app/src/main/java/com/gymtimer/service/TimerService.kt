@@ -106,6 +106,7 @@ class TimerService : Service() {
     // ── Session logic ─────────────────────────────────────────────────────────
 
     private fun startSession() {
+        sessionTimer?.cancel()  // guard against duplicate start calls
         sessionStartTimestamp = System.currentTimeMillis()
         _isSessionActive.value = true
         _sessionSeconds.value = 0L

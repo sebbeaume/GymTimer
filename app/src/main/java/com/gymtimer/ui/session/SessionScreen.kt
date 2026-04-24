@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +38,9 @@ fun SessionScreen(
     val isResting      by vm.isResting.collectAsState()
     val sessionSeconds by vm.sessionSeconds.collectAsState()
     val isActive       by vm.isSessionActive.collectAsState()
+
+    // Block the system back button — use "End Session" to exit
+    BackHandler {}
 
     // Navigate home only after the session was active and then stopped
     var sessionStarted by remember { mutableStateOf(false) }
