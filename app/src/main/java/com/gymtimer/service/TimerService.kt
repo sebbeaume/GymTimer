@@ -89,6 +89,13 @@ class TimerService : Service() {
     // Bound service not needed — we communicate via StateFlow + Intents
     override fun onBind(intent: Intent?): IBinder? = null
 
+    // Called when the user swipes the app away from the recents screen.
+    // Stop the session so the accessibility button disappears and state is clean.
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        stopSession()
+        super.onTaskRemoved(rootIntent)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         countDownTimer?.cancel()
