@@ -8,6 +8,8 @@ import android.app.Service
 import android.content.Intent
 import android.os.CountDownTimer
 import android.os.IBinder
+import android.os.PowerManager
+import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.core.app.NotificationCompat
@@ -56,15 +58,25 @@ class TimerService : Service() {
 
     private var restDurationSeconds = 90
     private var countDownTimer: CountDownTimer? = null
-    private var sessionTimer: CountDownTimer? = null   // counts UP via repeated 1s ticks
+    private var sessionTimer: CountDownTimer? = null
     private var vibrator: Vibrator? = null
     private var isVibrating = false
+
+    // Real-time anchors — calculated from SystemClock.elapsedRealtime() so that
+    // Doze-mode tick delays don't cause drift in the displayed times.
+    private var sessionStartRealtime = 0L
+    private var restStartRealtime = 0L
+
+    // Wake lock held only during an active rest countdown, released on finish/cancel.
+    private var wakeLock: PowerManager.WakeLock? = null
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     override fun onCreate() {
         super.onCreate()
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "GymTimer::RestWakeLock")
         createNotificationChannel()
     }
 
@@ -108,14 +120,15 @@ class TimerService : Service() {
     private fun startSession() {
         sessionTimer?.cancel()  // guard against duplicate start calls
         sessionStartTimestamp = System.currentTimeMillis()
+        sessionStartRealtime = SystemClock.elapsedRealtime()
         _isSessionActive.value = true
         _sessionSeconds.value = 0L
 
-        // Session clock: ticks every second, counts up indefinitely
-        // CountDownTimer counts DOWN, so we use a very large ceiling and compute elapsed time
+        // Session clock: derive elapsed seconds from the real-time anchor so that
+        // delayed ticks (Doze mode) don't cause the displayed time to fall behind.
         sessionTimer = object : CountDownTimer(Long.MAX_VALUE, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                _sessionSeconds.value++
+                _sessionSeconds.value = (SystemClock.elapsedRealtime() - sessionStartRealtime) / 1000
                 updateNotification()
             }
             override fun onFinish() { /* never reached */ }
@@ -127,6 +140,7 @@ class TimerService : Service() {
     private fun stopSession() {
         sessionTimer?.cancel()
         countDownTimer?.cancel()
+        releaseWakeLock()
         stopVibration()
         _isSessionActive.value = false
         _isResting.value = false
@@ -152,12 +166,14 @@ class TimerService : Service() {
             isVibrating -> {
                 // Timer expired and phone is buzzing → stop buzzing
                 stopVibration()
+                releaseWakeLock()
                 _isResting.value = false
                 _timerSeconds.value = 0
             }
             _isResting.value -> {
                 // Timer still counting → cancel it
                 countDownTimer?.cancel()
+                releaseWakeLock()
                 _isResting.value = false
                 _timerSeconds.value = 0
             }
@@ -172,23 +188,37 @@ class TimerService : Service() {
     // ── Rest countdown ────────────────────────────────────────────────────────
 
     private fun startRestCountdown() {
+        restStartRealtime = SystemClock.elapsedRealtime()
         _isResting.value = true
         _timerSeconds.value = restDurationSeconds
+
+        // Acquire wake lock so the CPU stays awake and the countdown fires on time.
+        if (wakeLock?.isHeld == false) wakeLock?.acquire(restDurationSeconds * 1000L + 5000L)
 
         countDownTimer = object : CountDownTimer(
             restDurationSeconds * 1000L,
             1000L
         ) {
             override fun onTick(millisUntilFinished: Long) {
-                _timerSeconds.value = (millisUntilFinished / 1000).toInt() + 1
+                // Derive remaining time from the real-time anchor to stay accurate
+                // even if ticks are delayed by Doze mode.
+                val elapsed = (SystemClock.elapsedRealtime() - restStartRealtime) / 1000
+                _timerSeconds.value = (restDurationSeconds - elapsed).coerceAtLeast(0).toInt()
                 updateNotification()
             }
 
             override fun onFinish() {
                 _timerSeconds.value = 0
+                releaseWakeLock()
                 startVibration()
             }
         }.start()
+    }
+
+    // ── Wake lock ─────────────────────────────────────────────────────────────
+
+    private fun releaseWakeLock() {
+        if (wakeLock?.isHeld == true) wakeLock?.release()
     }
 
     // ── Vibration ─────────────────────────────────────────────────────────────

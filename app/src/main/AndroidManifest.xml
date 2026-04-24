@@ -5,6 +5,13 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!--
+        WAKE_LOCK — keeps the CPU running during a rest countdown so the
+        countdown fires accurately even when the screen is off (Doze mode).
+        Released as soon as the countdown ends or is cancelled.
+    -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!--
         FOREGROUND_SERVICE — lets our TimerService keep running when the app
         is backgrounded (user switches to Netflix). Without this, Android
         would kill the service after a few minutes.
