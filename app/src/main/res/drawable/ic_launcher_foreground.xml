@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!--
+        Layout (viewport 108x108, safe zone 18–90):
+          Left clock  : center (32, 54), radius 14  → x: 18–46
+          Right clock : center (76, 54), radius 14  → x: 62–90
+          Handle      : left collar 40–46, grip 46–62, right collar 62–68
+                        collar height 10dp (y 49–59), grip height 6dp (y 51–57)
+
+        Draw order: handle → clock face fill (covers handle overlap) →
+                    clock ring → tick marks → hands → center pin
+    -->
+
+    <!-- ── Dumbbell handle ─────────────────────────────────────────────────── -->
+    <!-- H-shaped path: thick collars at each end, thinner grip in the middle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,49 L46,49 L46,51 L62,51 L62,49 L68,49
+                          L68,59 L62,59 L62,57 L46,57 L46,59 L40,59 Z" />
+
+    <!-- ── Left clock ──────────────────────────────────────────────────────── -->
+    <!-- Dark fill covers the handle overlap; white stroke = clock ring -->
+    <path
+        android:fillColor="#1B2A4A"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:pathData="M18,54 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0" />
+
+    <!-- Cardinal tick marks: 12 / 3 / 6 / 9 -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M32,40 L32,43  M46,54 L43,54  M32,68 L32,65  M18,54 L21,54" />
+
+    <!-- Hour hand → 10 o'clock (300° CW from 12) -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M32,54 L26,51" />
+
+    <!-- Minute hand → 2 o'clock (60° CW from 12) -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M32,54 L41,49" />
+
+    <!-- Center pin -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30.5,54 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" />
+
+    <!-- ── Right clock ─────────────────────────────────────────────────────── -->
+    <path
+        android:fillColor="#1B2A4A"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:pathData="M62,54 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0" />
+
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M76,40 L76,43  M90,54 L87,54  M76,68 L76,65  M62,54 L65,54" />
+
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M76,54 L70,51" />
+
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M76,54 L85,49" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M74.5,54 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" />
+
+</vector>
