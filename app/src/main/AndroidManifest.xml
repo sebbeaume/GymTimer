@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- VIBRATE permission — required to trigger haptic feedback -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!--
+        FOREGROUND_SERVICE — lets our TimerService keep running when the app
+        is backgrounded (user switches to Netflix). Without this, Android
+        would kill the service after a few minutes.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:name=".GymTimerApp"
+        android:allowBackup="true"
+        android:label="GymTimer"
+        android:theme="@style/Theme.GymTimer"
+        android:supportsRtl="true">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+            TimerService declared as a foreground service.
+            foregroundServiceType="specialUse" is required on Android 14+
+            when no other category fits (we're intercepting volume keys,
+            not playing media).
+        -->
+        <service
+            android:name=".service.TimerService"
+            android:foregroundServiceType="specialUse"
+            android:exported="false" />
+
+    </application>
+
+</manifest>
