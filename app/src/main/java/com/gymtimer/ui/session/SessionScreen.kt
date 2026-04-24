@@ -152,8 +152,8 @@ fun SessionScreen(
             // ── Hint text ─────────────────────────────────────────────────────
             Text(
                 text = when {
-                    isResting -> "Tap the accessibility button to cancel rest"
-                    else      -> "Tap the accessibility button after a set\nto start rest timer"
+                    isResting -> "Tap 'Cancel Rest' in the notification to stop"
+                    else      -> "Tap 'Start Rest' in the notification after a set"
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),

@@ -228,10 +228,22 @@ class TimerService : Service() {
 
     private fun buildNotification(): Notification {
         val tapIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
+        val tapPendingIntent = PendingIntent.getActivity(
             this, 0, tapIntent,
             PendingIntent.FLAG_IMMUTABLE
         )
+
+        val togglePendingIntent = PendingIntent.getService(
+            this, 0,
+            Intent(this, TimerService::class.java).apply { action = ACTION_REST_TOGGLE },
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val actionLabel = when {
+            isVibrating        -> "Dismiss"
+            _isResting.value   -> "Cancel Rest"
+            else               -> "Start Rest"
+        }
 
         val sessionTime = formatTime(_sessionSeconds.value)
         val restInfo = if (_isResting.value) "  |  Rest: ${formatTime(_timerSeconds.value.toLong())}" else ""
@@ -240,9 +252,10 @@ class TimerService : Service() {
             .setContentTitle("GymTimer active")
             .setContentText("Session: $sessionTime$restInfo")
             .setSmallIcon(android.R.drawable.ic_media_play)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(tapPendingIntent)
             .setOngoing(true)
             .setSilent(true)
+            .addAction(0, actionLabel, togglePendingIntent)
             .build()
     }
 
