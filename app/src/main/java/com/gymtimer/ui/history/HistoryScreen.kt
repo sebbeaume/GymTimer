@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -66,27 +67,49 @@ fun HistoryScreen(
                 }
             }
         } else {
+            var sessionToDelete by remember { mutableStateOf<SessionRecord?>(null) }
+
             LazyColumn(
                 modifier = Modifier.padding(padding),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(sessions, key = { it.id }) { session ->
-                    SessionHistoryCard(session)
+                    SessionHistoryCard(
+                        session = session,
+                        onDeleteClick = { sessionToDelete = session }
+                    )
                 }
+            }
+
+            sessionToDelete?.let { session ->
+                AlertDialog(
+                    onDismissRequest = { sessionToDelete = null },
+                    title = { Text("Delete session?") },
+                    text = { Text("${formatDate(session.startTimestamp)} — ${formatDuration(session.durationSeconds)}") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            vm.deleteSession(session)
+                            sessionToDelete = null
+                        }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { sessionToDelete = null }) { Text("Cancel") }
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun SessionHistoryCard(session: SessionRecord) {
+private fun SessionHistoryCard(session: SessionRecord, onDeleteClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -114,6 +137,13 @@ private fun SessionHistoryCard(session: SessionRecord) {
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
+            IconButton(onClick = onDeleteClick) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Delete session",
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                )
+            }
         }
     }
 }

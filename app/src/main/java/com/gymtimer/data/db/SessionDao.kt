@@ -1,6 +1,7 @@
 package com.gymtimer.data.db
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.gymtimer.data.model.SessionRecord
@@ -26,4 +27,7 @@ interface SessionDao {
      */
     @Query("SELECT * FROM sessions ORDER BY startTimestamp DESC")
     fun getAllSessions(): Flow<List<SessionRecord>>
+
+    @Delete
+    suspend fun delete(session: SessionRecord)
 }
