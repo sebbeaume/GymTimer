@@ -86,7 +86,7 @@ fun SessionScreen(
                 )
             }
 
-            HorizontalDivider(
+            Divider(
                 modifier = Modifier.width(80.dp),
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.15f)
             )
