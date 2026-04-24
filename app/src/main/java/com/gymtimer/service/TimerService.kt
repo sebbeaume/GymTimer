@@ -81,7 +81,7 @@ class TimerService : Service() {
                 startSession()
             }
             ACTION_STOP_SESSION -> stopSession()
-            ACTION_REST_TOGGLE -> handleVolumeDouble()
+            ACTION_REST_TOGGLE -> handleRestToggle()
         }
         return START_STICKY
     }
