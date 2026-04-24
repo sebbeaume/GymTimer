@@ -38,9 +38,11 @@ fun SessionScreen(
     val sessionSeconds by vm.sessionSeconds.collectAsState()
     val isActive       by vm.isSessionActive.collectAsState()
 
-    // Navigate home when the service stops the session
+    // Navigate home only after the session was active and then stopped
+    var sessionStarted by remember { mutableStateOf(false) }
     LaunchedEffect(isActive) {
-        if (!isActive) onSessionEnd()
+        if (isActive) sessionStarted = true
+        if (sessionStarted && !isActive) onSessionEnd()
     }
 
     // Background pulses to a dark red tint while resting
