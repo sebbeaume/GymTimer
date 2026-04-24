@@ -19,9 +19,6 @@ class GymTimerAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
 
-        // Button starts hidden — shown only when a session is active
-        setButtonVisible(false)
-
         // Register the tap callback
         accessibilityButtonController.registerAccessibilityButtonCallback(
             object : AccessibilityButtonController.AccessibilityButtonCallback() {
